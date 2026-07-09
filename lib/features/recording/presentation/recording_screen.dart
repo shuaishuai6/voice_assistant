@@ -523,8 +523,18 @@ class _BottomNavigationBar extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: const [
-          _NavItem(active: true, icon: Icons.mic, label: '录音'),
-          _NavItem(active: false, icon: Icons.article_outlined, label: '记录'),
+          _NavItem(
+            active: true,
+            activeAsset: FigmaAssets.greenMic,
+            inactiveAsset: FigmaAssets.mutedMic,
+            label: '录音',
+          ),
+          _NavItem(
+            active: false,
+            activeAsset: FigmaAssets.greenKit,
+            inactiveAsset: FigmaAssets.mutedKit,
+            label: '记录',
+          ),
         ],
       ),
     );
@@ -534,12 +544,14 @@ class _BottomNavigationBar extends StatelessWidget {
 class _NavItem extends StatelessWidget {
   const _NavItem({
     required this.active,
-    required this.icon,
+    required this.activeAsset,
+    required this.inactiveAsset,
     required this.label,
   });
 
   final bool active;
-  final IconData icon;
+  final String activeAsset;
+  final String inactiveAsset;
   final String label;
 
   @override
@@ -554,10 +566,11 @@ class _NavItem extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            icon,
-            size: 22,
-            color: active ? const Color(0xFF003221) : FigmaColors.textSecondary,
+          Image.asset(
+            active ? activeAsset : inactiveAsset,
+            width: active ? 14 : 20,
+            height: active ? 19 : 20,
+            fit: BoxFit.contain,
           ),
           const SizedBox(height: 4),
           Text(
