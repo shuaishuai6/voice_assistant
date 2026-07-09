@@ -1,16 +1,30 @@
-# voice_assistant
+# 医嘱备忘
 
-A new Flutter project.
+医生问诊语音记录。
 
-## Getting Started
+本项目是一个 Flutter iOS MVP，用于本地记录就诊对话并生成个人就诊回顾。MVP 不接入大模型，不上传录音、转写或总结内容。
 
-This project is a starting point for a Flutter application.
+## MVP 功能
 
-A few resources to get you started if this is your first Flutter project:
+- 一键本地录音
+- iOS 麦克风权限处理
+- 本地结构化就诊回顾
+- 双人对话时间线展示
+- 医学术语通俗解释
+- 纯文本分享
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## 隐私说明
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+所有 MVP 数据处理均在设备本地完成。分享功能只分享结构化文本，不分享原始录音。
+
+## 免责声明
+
+本 App 仅供个人记录就诊信息参考，不提供任何医疗诊断或治疗建议。所有内容以医生口头医嘱为准。
+
+## 开发验证
+
+```bash
+flutter analyze
+flutter test
+flutter build ios --simulator --debug --no-codesign
+```
