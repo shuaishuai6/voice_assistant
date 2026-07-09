@@ -4,6 +4,7 @@ import 'package:voice_assistant/features/analysis/domain/visit_analysis_service.
 import 'package:voice_assistant/features/recording/domain/recording_service.dart';
 import 'package:voice_assistant/features/recording/domain/recording_session.dart';
 import 'package:voice_assistant/features/recording/presentation/recording_controller.dart';
+import 'package:voice_assistant/features/records/presentation/records_screen.dart';
 import 'package:voice_assistant/features/results/presentation/results_screen.dart';
 import 'package:voice_assistant/features/share/share_service.dart';
 
@@ -79,9 +80,17 @@ class _RecordingScreenState extends State<RecordingScreen> {
                   ],
                 ),
               ),
-              const Align(
+              Align(
                 alignment: Alignment.bottomCenter,
-                child: _BottomNavigationBar(),
+                child: _BottomNavigationBar(
+                  onRecordsTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => const RecordsScreen(),
+                      ),
+                    );
+                  },
+                ),
               ),
             ],
           );
@@ -497,7 +506,9 @@ class _ActionCard extends StatelessWidget {
 }
 
 class _BottomNavigationBar extends StatelessWidget {
-  const _BottomNavigationBar();
+  const _BottomNavigationBar({required this.onRecordsTap});
+
+  final VoidCallback onRecordsTap;
 
   @override
   Widget build(BuildContext context) {
@@ -522,8 +533,8 @@ class _BottomNavigationBar extends StatelessWidget {
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: const [
-          _NavItem(
+        children: [
+          const _NavItem(
             active: true,
             activeAsset: FigmaAssets.greenMic,
             inactiveAsset: FigmaAssets.mutedMic,
@@ -534,6 +545,7 @@ class _BottomNavigationBar extends StatelessWidget {
             activeAsset: FigmaAssets.greenKit,
             inactiveAsset: FigmaAssets.mutedKit,
             label: '记录',
+            onTap: onRecordsTap,
           ),
         ],
       ),
@@ -547,45 +559,51 @@ class _NavItem extends StatelessWidget {
     required this.activeAsset,
     required this.inactiveAsset,
     required this.label,
+    this.onTap,
   });
 
   final bool active;
   final String activeAsset;
   final String inactiveAsset;
   final String label;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 88,
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      decoration: BoxDecoration(
-        color: active ? FigmaColors.accentGreen : Colors.transparent,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.asset(
-            active ? activeAsset : inactiveAsset,
-            width: active ? 14 : 20,
-            height: active ? 19 : 20,
-            fit: BoxFit.contain,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              color: active
-                  ? const Color(0xFF003221)
-                  : FigmaColors.textSecondary,
-              fontSize: 12,
-              height: 16 / 12,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.24,
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Container(
+        width: 88,
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          color: active ? FigmaColors.accentGreen : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              active ? activeAsset : inactiveAsset,
+              width: active ? 14 : 20,
+              height: active ? 19 : 20,
+              fit: BoxFit.contain,
             ),
-          ),
-        ],
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                color: active
+                    ? const Color(0xFF003221)
+                    : FigmaColors.textSecondary,
+                fontSize: 12,
+                height: 16 / 12,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.24,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

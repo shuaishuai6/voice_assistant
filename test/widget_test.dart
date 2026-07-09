@@ -13,6 +13,28 @@ void main() {
     expect(_assetImage('assets/images/node-id=2-826-1.png'), findsOneWidget);
     expect(_assetImage('assets/images/node-id=2-832-2.png'), findsOneWidget);
   });
+
+  testWidgets('records tab opens list and first record opens detail', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const VisitNotesApp());
+
+    await tester.tap(find.text('记录'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('最近录入'), findsOneWidget);
+    expect(find.text('皮肤过敏'), findsOneWidget);
+    expect(_assetImage('assets/images/node-id=2-826-2.png'), findsOneWidget);
+    expect(_assetImage('assets/images/node-id=2-832-1.png'), findsWidgets);
+
+    await tester.tap(find.text('查看详情').first);
+    await tester.pumpAndSettle();
+
+    expect(find.text('2026年1月23日 周五'), findsOneWidget);
+    expect(find.text('对话记录'), findsOneWidget);
+    expect(find.text('AI 总结'), findsOneWidget);
+    expect(find.text('医生 (Speaker A)'), findsWidgets);
+  });
 }
 
 Finder _assetImage(String assetName) {

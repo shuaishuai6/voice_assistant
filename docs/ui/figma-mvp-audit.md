@@ -55,6 +55,8 @@ The Figma MCP asset URLs for several icons returned SVG payloads. The app curren
 | Recording idle | `1:359` 首页 - 录音 (视觉重构版) | `lib/features/recording/presentation/recording_screen.dart` |
 | Recording active | Pending exact frame context | `lib/features/recording/presentation/recording_screen.dart` |
 | Analysis loading | Pending exact frame context | `lib/features/recording/presentation/recording_screen.dart` |
+| Records list | `1:255` 医疗档案 - 列表 | `lib/features/records/presentation/records_screen.dart` |
+| Record detail | `1:122` 诊疗对话 - 时间线 | `lib/features/records/presentation/record_detail_screen.dart` |
 | Results | Pending exact frame context | `lib/features/results/presentation/results_screen.dart` |
 
 ## Asset Inventory
