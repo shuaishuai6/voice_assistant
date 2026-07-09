@@ -5,8 +5,9 @@ void main() {
   testWidgets('app renders the recording entry screen', (tester) async {
     await tester.pumpWidget(const VisitNotesApp());
 
-    expect(find.text('医嘱备忘'), findsOneWidget);
-    expect(find.text('开始录音'), findsOneWidget);
-    expect(find.textContaining('本 App 仅供个人记录'), findsOneWidget);
+    expect(find.text('诊断备忘录'), findsOneWidget);
+    expect(find.text('开始记录'), findsOneWidget);
+    expect(find.text('今日已处理 12 份病历录音'), findsOneWidget);
+    expect(find.text('SYSTEM READY'), findsOneWidget);
   });
 }

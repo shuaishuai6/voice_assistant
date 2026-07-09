@@ -2,14 +2,14 @@
 
 ## Source
 
-- Figma URL: https://www.figma.com/design/7bUyqy99lLPciIyMhakxlW/%E5%8C%BB%E5%98%B1%E5%A4%87%E5%BF%98?m=auto&t=j9fOzromOIdEIvRV-6
+- Figma URL: https://www.figma.com/design/7bUyqy99lLPciIyMhakxlW/%E5%8C%BB%E5%98%B1%E5%A4%87%E5%BF%98?node-id=1-359&t=JVhNJSbKYHkEMAmP-4
 - Retrieved date: 2026-07-09
-- MCP status: Figma MCP tools are not available in this session.
-- Current implementation source: exported assets under `assets/images/` plus product requirements.
+- MCP status: Figma MCP `get_design_context` and `get_screenshot` succeeded for node `1:359`.
+- Current implementation source: Figma node `1:359` plus exported PNG assets under `assets/images/`.
 
 ## Current Constraint
 
-The available exported assets include icon states only, not full-page screenshots or structured Figma frame data. UI implementation will use these assets and the visible brand direction from them, but exact Figma parity still requires frame screenshots or MCP design context before final visual sign-off.
+The Figma MCP asset URLs for several icons returned SVG payloads. The app currently avoids adding an SVG rendering dependency, so the implementation reuses existing PNG assets for the microphone and record icons, and uses Flutter built-in icons for the simple camera/upload/nav glyphs. Layout, visible text, colors, spacing, card sizing, and the main recording button structure follow node `1:359`.
 
 ## Tokens
 
@@ -17,13 +17,13 @@ The available exported assets include icon states only, not full-page screenshot
 
 | Token | Value | Used For |
 | --- | --- | --- |
-| Background | `#F8FBF8` | App background |
+| Background | `#FCF9F8` | App background and bottom navigation |
 | Surface | `#FFFFFF` | Cards and panels |
-| Text primary | `#123128` | Main text |
-| Text secondary | `#6B7D75` | Supporting text |
-| Brand green | `#00513E` | Primary actions and doctor timeline |
-| Muted green | `#6F8078` | Inactive icon state |
-| Patient green | `#4BA06D` | Patient timeline |
+| Text primary | `#1C1B1B` | Main text |
+| Text secondary | `#3D4A42` | Supporting text |
+| Brand green | `#006C4B` | Header title, main button gradient start, status dot |
+| Accent green | `#00A676` | Main button gradient end, active nav background |
+| Soft green | `rgba(0,166,118,0.10)` | Daily processed badge |
 | Record red | `#D83B32` | Active stop/record emphasis |
 
 ### Typography
@@ -44,14 +44,15 @@ The available exported assets include icon states only, not full-page screenshot
 | `md` | 16 | Standard content padding |
 | `lg` | 24 | Page spacing |
 | `xl` | 32 | Screen section spacing |
-| Card radius | 8 | Repeated content cards |
-| Button radius | 28 | Large recording action |
+| Card radius | 16 | Secondary action cards |
+| Main button size | 224 | Recording action |
+| Bottom nav height | 78 | Fixed bottom navigation |
 
 ## Required Screens
 
 | Screen | Figma Frame | Implementation File |
 | --- | --- | --- |
-| Recording idle | Pending exact frame context | `lib/features/recording/presentation/recording_screen.dart` |
+| Recording idle | `1:359` 首页 - 录音 (视觉重构版) | `lib/features/recording/presentation/recording_screen.dart` |
 | Recording active | Pending exact frame context | `lib/features/recording/presentation/recording_screen.dart` |
 | Analysis loading | Pending exact frame context | `lib/features/recording/presentation/recording_screen.dart` |
 | Results | Pending exact frame context | `lib/features/results/presentation/results_screen.dart` |

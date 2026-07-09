@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:voice_assistant/app/figma_tokens.dart';
-import 'package:voice_assistant/core/disclaimer.dart';
 import 'package:voice_assistant/features/analysis/domain/visit_analysis_service.dart';
 import 'package:voice_assistant/features/recording/domain/recording_service.dart';
 import 'package:voice_assistant/features/recording/domain/recording_session.dart';
@@ -43,34 +42,50 @@ class _RecordingScreenState extends State<RecordingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: FigmaColors.background,
-      body: SafeArea(
-        child: ValueListenableBuilder<RecordingSession>(
-          valueListenable: _controller,
-          builder: (context, session, _) {
-            return Padding(
-              padding: const EdgeInsets.all(FigmaSpacing.lg),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const _Header(),
-                  const SizedBox(height: FigmaSpacing.xl),
-                  Expanded(child: _MainActionArea(session: session)),
-                  if (session.errorMessage != null) ...[
-                    const SizedBox(height: FigmaSpacing.md),
-                    _ErrorBanner(message: session.errorMessage!),
+      body: ValueListenableBuilder<RecordingSession>(
+        valueListenable: _controller,
+        builder: (context, session, _) {
+          return Stack(
+            children: [
+              const _FigmaBackground(),
+              SafeArea(
+                bottom: false,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const _TopAppBar(),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.fromLTRB(28, 32, 28, 128),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const _GreetingSection(),
+                            const SizedBox(height: 32),
+                            _RecordingButtonArea(
+                              session: session,
+                              onPressed: () => _handlePrimaryAction(session),
+                            ),
+                            if (session.errorMessage != null) ...[
+                              const SizedBox(height: 24),
+                              _ErrorBanner(message: session.errorMessage!),
+                            ],
+                            const SizedBox(height: 32),
+                            const _SecondaryActionsGrid(),
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
-                  const SizedBox(height: FigmaSpacing.lg),
-                  _RecordActionButton(
-                    session: session,
-                    onPressed: () => _handlePrimaryAction(session),
-                  ),
-                  const SizedBox(height: FigmaSpacing.lg),
-                  const _Disclaimer(),
-                ],
+                ),
               ),
-            );
-          },
-        ),
+              const Align(
+                alignment: Alignment.bottomCenter,
+                child: _BottomNavigationBar(),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -102,59 +117,111 @@ class _RecordingScreenState extends State<RecordingScreen> {
               ),
             ),
           );
-          if (mounted) {
-            setState(() {});
-          }
-          return;
         } catch (_) {
           _controller.markFailed('本地分析暂时没有完成，请稍后重试。');
-          return;
         }
+        return;
       case RecordingStatus.requestingPermission:
       case RecordingStatus.stopping:
       case RecordingStatus.analyzing:
-        break;
+        return;
     }
   }
 }
 
-class _Header extends StatelessWidget {
-  const _Header();
+class _FigmaBackground extends StatelessWidget {
+  const _FigmaBackground();
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            color: FigmaColors.action,
-            borderRadius: BorderRadius.circular(FigmaRadius.md),
+    return const DecoratedBox(
+      decoration: BoxDecoration(
+        color: FigmaColors.background,
+        gradient: RadialGradient(
+          center: Alignment.topRight,
+          radius: 1.2,
+          colors: [Color(0x265BDDA8), Color(0x00FFFFFF)],
+          stops: [0, 0.55],
+        ),
+      ),
+      child: SizedBox.expand(),
+    );
+  }
+}
+
+class _TopAppBar extends StatelessWidget {
+  const _TopAppBar();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 64,
+      padding: const EdgeInsets.symmetric(horizontal: 28),
+      color: FigmaColors.background,
+      alignment: Alignment.centerLeft,
+      child: Row(
+        children: [
+          Image.asset(FigmaAssets.greenKit, width: 24, height: 24),
+          const SizedBox(width: 12),
+          const Text(
+            '诊断备忘录',
+            style: TextStyle(
+              color: FigmaColors.brandGreen,
+              fontSize: 20,
+              height: 1.3,
+              fontWeight: FontWeight.w800,
+            ),
           ),
-          child: Center(
-            child: Image.asset(FigmaAssets.whiteKit, width: 28, height: 28),
+        ],
+      ),
+    );
+  }
+}
+
+class _GreetingSection extends StatelessWidget {
+  const _GreetingSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          '下午好',
+          style: TextStyle(
+            color: FigmaColors.textPrimary,
+            fontSize: 20,
+            height: 1.3,
+            fontWeight: FontWeight.w400,
           ),
         ),
-        const SizedBox(width: FigmaSpacing.md),
-        const Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 7),
+          decoration: BoxDecoration(
+            color: FigmaColors.accentGreen.withValues(alpha: 0.10),
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(
+              color: FigmaColors.accentGreen.withValues(alpha: 0.20),
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                '医嘱备忘',
-                style: TextStyle(
-                  color: FigmaColors.textPrimary,
-                  fontSize: 28,
-                  fontWeight: FontWeight.w800,
-                ),
+              const Icon(
+                Icons.check_circle_outline,
+                color: FigmaColors.brandGreen,
+                size: 14,
               ),
-              SizedBox(height: FigmaSpacing.xs),
+              const SizedBox(width: 8),
               Text(
-                '本机记录就诊回顾',
+                '今日已处理 12 份病历录音',
                 style: TextStyle(
-                  color: FigmaColors.textSecondary,
-                  fontSize: 14,
+                  color: FigmaColors.brandGreen,
+                  fontSize: 12,
+                  height: 16 / 12,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.24,
                 ),
               ),
             ],
@@ -165,165 +232,347 @@ class _Header extends StatelessWidget {
   }
 }
 
-class _MainActionArea extends StatelessWidget {
-  const _MainActionArea({required this.session});
-
-  final RecordingSession session;
-
-  @override
-  Widget build(BuildContext context) {
-    final isRecording = session.status == RecordingStatus.recording;
-    final isAnalyzing = session.status == RecordingStatus.analyzing;
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 184,
-            height: 184,
-            decoration: BoxDecoration(
-              color: isRecording ? FigmaColors.danger : FigmaColors.action,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: (isRecording ? FigmaColors.danger : FigmaColors.action)
-                      .withValues(alpha: 0.18),
-                  blurRadius: 32,
-                  offset: const Offset(0, 18),
-                ),
-              ],
-            ),
-            child: Center(
-              child: isAnalyzing
-                  ? const SizedBox(
-                      width: 48,
-                      height: 48,
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                        strokeWidth: 4,
-                      ),
-                    )
-                  : Image.asset(FigmaAssets.whiteMic, width: 72, height: 112),
-            ),
-          ),
-          const SizedBox(height: FigmaSpacing.xl),
-          Text(
-            _statusTitle(session.status),
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: FigmaColors.textPrimary,
-              fontSize: 22,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: FigmaSpacing.sm),
-          Text(
-            _statusDescription(session.status),
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: FigmaColors.textSecondary,
-              fontSize: 15,
-              height: 1.45,
-            ),
-          ),
-          if (isRecording) ...[
-            const SizedBox(height: FigmaSpacing.xl),
-            const _Waveform(),
-          ],
-        ],
-      ),
-    );
-  }
-
-  String _statusTitle(RecordingStatus status) {
-    return switch (status) {
-      RecordingStatus.recording => '正在记录',
-      RecordingStatus.requestingPermission => '请求麦克风权限',
-      RecordingStatus.stopping => '正在保存',
-      RecordingStatus.analyzing => '分析中',
-      RecordingStatus.failed => '未能开始记录',
-      RecordingStatus.completed => '已保存记录',
-      RecordingStatus.idle => '开始记录',
-    };
-  }
-
-  String _statusDescription(RecordingStatus status) {
-    return switch (status) {
-      RecordingStatus.recording => '就诊过程中可以锁屏或切到后台。',
-      RecordingStatus.requestingPermission => '请允许麦克风权限。',
-      RecordingStatus.stopping => '录音正在保存到本机。',
-      RecordingStatus.analyzing => '正在生成本地就诊回顾。',
-      RecordingStatus.failed => '请检查权限后再次尝试。',
-      RecordingStatus.completed => '可以开始一段新的记录。',
-      RecordingStatus.idle => '点击下方按钮开始本地录音。',
-    };
-  }
-}
-
-class _Waveform extends StatelessWidget {
-  const _Waveform();
-
-  @override
-  Widget build(BuildContext context) {
-    const heights = [18.0, 34.0, 26.0, 48.0, 30.0, 42.0, 22.0, 36.0];
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: heights
-          .map(
-            (height) => Container(
-              width: 6,
-              height: height,
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              decoration: BoxDecoration(
-                color: FigmaColors.action,
-                borderRadius: BorderRadius.circular(3),
-              ),
-            ),
-          )
-          .toList(),
-    );
-  }
-}
-
-class _RecordActionButton extends StatelessWidget {
-  const _RecordActionButton({required this.session, required this.onPressed});
+class _RecordingButtonArea extends StatelessWidget {
+  const _RecordingButtonArea({required this.session, required this.onPressed});
 
   final RecordingSession session;
   final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
-    final disabled = switch (session.status) {
+    final isBusy = switch (session.status) {
       RecordingStatus.requestingPermission ||
       RecordingStatus.stopping ||
       RecordingStatus.analyzing => true,
       _ => false,
     };
-    final isRecording = session.status == RecordingStatus.recording;
     return SizedBox(
       width: double.infinity,
-      height: 64,
-      child: FilledButton.icon(
-        onPressed: disabled ? null : onPressed,
-        style: FilledButton.styleFrom(
-          backgroundColor: isRecording
-              ? FigmaColors.danger
-              : FigmaColors.action,
-          foregroundColor: Colors.white,
-          disabledBackgroundColor: FigmaColors.mutedGreen,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(FigmaRadius.action),
+      child: Column(
+        children: [
+          SizedBox(
+            height: 360,
+            child: Center(
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Container(
+                    width: 336,
+                    height: 336,
+                    decoration: BoxDecoration(
+                      color: FigmaColors.accentGreen.withValues(alpha: 0.10),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  Container(
+                    width: 280,
+                    height: 280,
+                    decoration: BoxDecoration(
+                      color: FigmaColors.accentGreen.withValues(alpha: 0.14),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: isBusy ? null : onPressed,
+                    child: Container(
+                      width: 224,
+                      height: 224,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            FigmaColors.brandGreen,
+                            FigmaColors.accentGreen,
+                          ],
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color(0x4D006C4B),
+                            blurRadius: 30,
+                            offset: Offset(0, 10),
+                          ),
+                          BoxShadow(
+                            color: Color(0x1A006C4B),
+                            blurRadius: 40,
+                            offset: Offset(0, 20),
+                          ),
+                        ],
+                      ),
+                      child: isBusy
+                          ? const Center(
+                              child: SizedBox(
+                                width: 44,
+                                height: 44,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 4,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            )
+                          : Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  FigmaAssets.whiteMic,
+                                  width: 38,
+                                  height: 58,
+                                  fit: BoxFit.contain,
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  session.status == RecordingStatus.recording
+                                      ? '停止记录'
+                                      : '开始记录',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    height: 24 / 18,
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: 0.9,
+                                  ),
+                                ),
+                              ],
+                            ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            _statusLine(session.status),
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: FigmaColors.textSecondary,
+              fontSize: 16,
+              height: 24 / 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 6,
+                height: 6,
+                decoration: const BoxDecoration(
+                  color: FigmaColors.brandGreen,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: 6),
+              const Text(
+                'SYSTEM READY',
+                style: TextStyle(
+                  color: Color(0x99006C4B),
+                  fontSize: 11,
+                  height: 14 / 11,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 1.1,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _statusLine(RecordingStatus status) {
+    return switch (status) {
+      RecordingStatus.recording => '正在为您捕捉诊室细节',
+      RecordingStatus.requestingPermission => '正在请求麦克风权限',
+      RecordingStatus.stopping => '正在保存录音',
+      RecordingStatus.analyzing => '正在生成就诊回顾',
+      RecordingStatus.failed => '请检查权限后再次尝试',
+      RecordingStatus.completed => '进入诊室，AI 为您捕捉细节',
+      RecordingStatus.idle => '进入诊室，AI 为您捕捉细节',
+    };
+  }
+}
+
+class _SecondaryActionsGrid extends StatelessWidget {
+  const _SecondaryActionsGrid();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: const [
+        Expanded(
+          child: _ActionCard(
+            icon: Icons.camera_alt,
+            iconColor: Color(0xFF0B2441),
+            iconBackground: Color(0xFFD4E3FF),
+            title: '拍处方单',
+            subtitle: 'OCR 自动识别',
           ),
         ),
-        icon: Image.asset(
-          isRecording ? FigmaAssets.whiteKit : FigmaAssets.whiteMic,
-          width: isRecording ? 24 : 20,
-          height: isRecording ? 24 : 32,
+        SizedBox(width: 16),
+        Expanded(
+          child: _ActionCard(
+            icon: Icons.upload_file,
+            iconColor: Color(0xFF4F2B0C),
+            iconBackground: Color(0xFFFFDDBB),
+            title: '上传音频',
+            subtitle: '支持 MP3/WAV',
+          ),
         ),
-        label: Text(
-          isRecording ? '停止录音' : '开始录音',
-          style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800),
-        ),
+      ],
+    );
+  }
+}
+
+class _ActionCard extends StatelessWidget {
+  const _ActionCard({
+    required this.icon,
+    required this.iconColor,
+    required this.iconBackground,
+    required this.title,
+    required this.subtitle,
+  });
+
+  final IconData icon;
+  final Color iconColor;
+  final Color iconBackground;
+  final String title;
+  final String subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      padding: const EdgeInsets.all(17),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.70),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.50)),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 12,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: iconBackground,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: iconColor, size: 22),
+          ),
+          const Spacer(),
+          Text(
+            title,
+            style: const TextStyle(
+              color: FigmaColors.textPrimary,
+              fontSize: 16,
+              height: 20 / 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          Text(
+            subtitle,
+            style: const TextStyle(
+              color: FigmaColors.textSecondary,
+              fontSize: 12,
+              height: 16 / 12,
+              fontWeight: FontWeight.w500,
+              letterSpacing: 0.24,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BottomNavigationBar extends StatelessWidget {
+  const _BottomNavigationBar();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 78 + MediaQuery.paddingOf(context).bottom,
+      padding: EdgeInsets.fromLTRB(
+        72,
+        8,
+        72,
+        8 + MediaQuery.paddingOf(context).bottom,
+      ),
+      decoration: const BoxDecoration(
+        color: FigmaColors.background,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+        boxShadow: [
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 6,
+            offset: Offset(0, -4),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: const [
+          _NavItem(active: true, icon: Icons.mic, label: '录音'),
+          _NavItem(active: false, icon: Icons.article_outlined, label: '记录'),
+        ],
+      ),
+    );
+  }
+}
+
+class _NavItem extends StatelessWidget {
+  const _NavItem({
+    required this.active,
+    required this.icon,
+    required this.label,
+  });
+
+  final bool active;
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 88,
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      decoration: BoxDecoration(
+        color: active ? FigmaColors.accentGreen : Colors.transparent,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            size: 22,
+            color: active ? const Color(0xFF003221) : FigmaColors.textSecondary,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              color: active
+                  ? const Color(0xFF003221)
+                  : FigmaColors.textSecondary,
+              fontSize: 12,
+              height: 16 / 12,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.24,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -338,30 +587,14 @@ class _ErrorBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(FigmaSpacing.md),
+      padding: const EdgeInsets.all(13),
       decoration: BoxDecoration(
         color: FigmaColors.warningSurface,
-        borderRadius: BorderRadius.circular(FigmaRadius.md),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
         message,
         style: const TextStyle(color: FigmaColors.warningText, fontSize: 14),
-      ),
-    );
-  }
-}
-
-class _Disclaimer extends StatelessWidget {
-  const _Disclaimer();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Text(
-      medicalDisclaimer,
-      style: TextStyle(
-        color: FigmaColors.textSecondary,
-        fontSize: 12,
-        height: 1.4,
       ),
     );
   }
