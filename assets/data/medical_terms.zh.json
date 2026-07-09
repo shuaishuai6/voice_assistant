@@ -1,0 +1,20 @@
+[
+  {
+    "term": "心电图",
+    "plainLanguageExplanation": "一种记录心脏电活动的检查，常用于观察心律和心肌供血线索。",
+    "aliases": ["ECG"],
+    "category": "检查"
+  },
+  {
+    "term": "超声",
+    "plainLanguageExplanation": "使用声波观察身体内部结构的检查，常见于腹部、心脏、血管等部位。",
+    "aliases": ["B超", "彩超"],
+    "category": "检查"
+  },
+  {
+    "term": "复查",
+    "plainLanguageExplanation": "按照医生建议在之后某个时间再次检查或回诊，用来观察恢复或变化。",
+    "aliases": ["复诊"],
+    "category": "就诊安排"
+  }
+]
